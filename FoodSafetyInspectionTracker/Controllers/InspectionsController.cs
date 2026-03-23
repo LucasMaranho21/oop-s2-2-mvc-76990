@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using FoodSafetyInspectionTracker.Data;
 using FoodSafetyInspectionTracker.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace FoodSafetyInspectionTracker.Controllers
 {
@@ -15,10 +16,12 @@ namespace FoodSafetyInspectionTracker.Controllers
     public class InspectionsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<InspectionsController> _logger;
 
-        public InspectionsController(ApplicationDbContext context)
+        public InspectionsController(ApplicationDbContext context, ILogger<InspectionsController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Inspections
@@ -39,6 +42,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             var inspection = await _context.Inspections
                 .Include(i => i.Premises)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (inspection == null)
             {
                 return NotFound();
@@ -47,28 +51,39 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-       
+        // GET: Inspections/Create
+        [Authorize(Roles = "Admin,Inspector")]
         public IActionResult Create()
         {
-            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Address");
+            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Name");
             return View();
         }
 
+        // POST: Inspections/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Inspector")]
         public async Task<IActionResult> Create([Bind("Id,PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
         {
             if (ModelState.IsValid)
             {
                 _context.Add(inspection);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Inspection created with Id {InspectionId} for PremisesId {PremisesId}",
+                    inspection.Id,
+                    inspection.PremisesId);
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Address", inspection.PremisesId);
+
+            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Name", inspection.PremisesId);
             return View(inspection);
         }
 
-     
+        // GET: Inspections/Edit/5
+        [Authorize(Roles = "Admin,Inspector")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,12 +96,15 @@ namespace FoodSafetyInspectionTracker.Controllers
             {
                 return NotFound();
             }
-            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Address", inspection.PremisesId);
+
+            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Name", inspection.PremisesId);
             return View(inspection);
         }
 
+        // POST: Inspections/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Inspector")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
         {
             if (id != inspection.Id)
@@ -100,6 +118,10 @@ namespace FoodSafetyInspectionTracker.Controllers
                 {
                     _context.Update(inspection);
                     await _context.SaveChangesAsync();
+
+                    _logger.LogInformation(
+                        "Inspection updated with Id {InspectionId}",
+                        inspection.Id);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -112,13 +134,16 @@ namespace FoodSafetyInspectionTracker.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Address", inspection.PremisesId);
+
+            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Name", inspection.PremisesId);
             return View(inspection);
         }
 
-      
+        // GET: Inspections/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -129,6 +154,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             var inspection = await _context.Inspections
                 .Include(i => i.Premises)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (inspection == null)
             {
                 return NotFound();
@@ -137,18 +163,23 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-       
+        // POST: Inspections/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var inspection = await _context.Inspections.FindAsync(id);
             if (inspection != null)
             {
                 _context.Inspections.Remove(inspection);
+                await _context.SaveChangesAsync();
+
+                _logger.LogWarning(
+                    "Inspection deleted with Id {InspectionId}",
+                    id);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
