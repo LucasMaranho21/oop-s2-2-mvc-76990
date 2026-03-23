@@ -1,0 +1,29 @@
+name: .NET CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
+    - name: Restore
+      run: dotnet restore ./FoodSafetyInspectionTracker/FoodSafetyInspectionTracker.csproj
+
+    - name: Build web project
+      run: dotnet build ./FoodSafetyInspectionTracker/FoodSafetyInspectionTracker.csproj --configuration Release --no-restore
+
+    - name: Test
+      run: dotnet test ./FoodSafetyInspectionTracker.Tests/FoodSafetyInspectionTracker.Tests.csproj --configuration Release
