@@ -19,14 +19,14 @@ namespace FoodSafetyInspectionTracker.Controllers
             _context = context;
         }
 
-        // GET: FollowUps
+        
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.FollowUps.Include(f => f.Inspection);
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: FollowUps/Details/5
+        
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -52,9 +52,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View();
         }
 
-        // POST: FollowUps/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,InspectionId,DueDate,Status,ClosedDate")] FollowUp followUp)
@@ -69,7 +67,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(followUp);
         }
 
-        // GET: FollowUps/Edit/5
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,9 +84,6 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(followUp);
         }
 
-        // POST: FollowUps/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,InspectionId,DueDate,Status,ClosedDate")] FollowUp followUp)
@@ -122,7 +117,6 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(followUp);
         }
 
-        // GET: FollowUps/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +135,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(followUp);
         }
 
-        // POST: FollowUps/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

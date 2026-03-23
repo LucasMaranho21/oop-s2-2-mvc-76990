@@ -1,6 +1,7 @@
 using FoodSafetyInspectionTracker.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using FoodSafetyInspectionTracker.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,5 +44,11 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.MapRazorPages();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbSeeder.SeedAsync(services);
+}
 
 app.Run();

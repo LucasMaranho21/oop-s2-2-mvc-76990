@@ -45,16 +45,13 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-        // GET: Inspections/Create
+       
         public IActionResult Create()
         {
             ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Address");
             return View();
         }
 
-        // POST: Inspections/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
@@ -69,7 +66,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-        // GET: Inspections/Edit/5
+     
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,9 +83,6 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-        // POST: Inspections/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
@@ -122,7 +116,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-        // GET: Inspections/Delete/5
+      
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +135,7 @@ namespace FoodSafetyInspectionTracker.Controllers
             return View(inspection);
         }
 
-        // POST: Inspections/Delete/5
+       
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
